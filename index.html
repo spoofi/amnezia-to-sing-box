@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AmneziaVPN to Sing-Box Converter</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js" crossorigin="anonymous"
+    referrerpolicy="no-referrer"></script>
+
+</head>
+
+<body>
+  <div class="page">
+
+    <header class="header">
+      <h1>
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#58a6ff" stroke-width="1.8">
+          <rect x="3" y="11" width="18" height="11" rx="2" />
+          <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+        </svg>
+        AmneziaVPN to Sing-Box Converter
+      </h1>
+      <p>Convert to AWG endpoint config for <a href="https://github.com/spoofi/sing-box-awg" target="_blank"
+          rel="noopener" style="color:#58a6ff;text-decoration:none;">sing-box with AWG support</a>. Accepts a
+        <code>vpn://</code> key or the native AmneziaWG format. Everything is processed locally in the browser.
+      </p>
+    </header>
+
+    <!-- Input -->
+    <div class="card">
+      <label class="field-label" for="key-input">vpn:// key or AmneziaWG native format</label>
+      <textarea id="key-input" placeholder="vpn://...
+or
+[Interface]&#10;Address = ...&#10;PrivateKey = ..." spellcheck="false" autocomplete="off" autocorrect="off"></textarea>
+      <div class="btn-row">
+        <button class="btn btn-primary" id="btn-convert" onclick="convert()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M5 12h14M12 5l7 7-7 7" />
+          </svg>
+          Convert
+        </button>
+        <button class="btn btn-ghost" onclick="clearAll()">Clear</button>
+      </div>
+    </div>
+
+    <!-- Alerts -->
+    <div class="alert alert-error" id="alert-error">
+      <span class="alert-icon">✕</span>
+      <div class="alert-body">
+        <div class="alert-title" id="alert-error-title">Ошибка</div>
+        <div class="alert-detail" id="alert-error-detail"></div>
+      </div>
+      <button class="alert-close" onclick="closeAlert('alert-error')" title="Закрыть">✕</button>
+    </div>
+
+    <div class="alert alert-ok" id="alert-ok">
+      <span class="alert-icon">✓</span>
+      <div class="alert-body">
+        <div id="alert-ok-text"></div>
+      </div>
+      <button class="alert-close" onclick="closeAlert('alert-ok')" title="Закрыть">✕</button>
+    </div>
+
+    <div class="alert alert-warn" id="alert-warn">
+      <span class="alert-icon">⚠</span>
+      <div class="alert-body">
+        <div id="alert-warn-text"></div>
+      </div>
+      <button class="alert-close" onclick="closeAlert('alert-warn')" title="Закрыть">✕</button>
+    </div>
+
+    <!-- Output -->
+    <div id="output-section">
+      <div class="card">
+        <div class="output-bar">
+          <span class="field-label">Result — editable JSON</span>
+          <span class="badge" id="badge-count"></span>
+        </div>
+        <textarea id="output" spellcheck="false" autocomplete="off"></textarea>
+        <div class="btn-row">
+          <button class="btn btn-copy" id="btn-copy" onclick="copyResult()">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <rect x="9" y="9" width="13" height="13" rx="2" />
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+            </svg>
+            Copy
+          </button>
+          <button class="btn btn-ghost" onclick="formatJSON()">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <polyline points="16 18 22 12 16 6" />
+              <polyline points="8 6 2 12 8 18" />
+            </svg>
+            Format JSON
+          </button>
+        </div>
+        <p class="hint">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10" />
+            <line x1="12" y1="8" x2="12" y2="12" />
+            <line x1="12" y1="16" x2="12.01" y2="16" />
+          </svg>
+          The output is editable — feel free to change the tag, name, or any parameter before copying.
+        </p>
+      </div>
+    </div>
+
+    <a class="gh-link" href="https://github.com/spoofi/sing-box-awg" target="_blank" rel="noopener" title="GitHub">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+        <path
+          d="M12 2C6.477 2 2 6.477 2 12c0 4.418 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.009-.868-.013-1.703-2.782.604-3.369-1.341-3.369-1.341-.454-1.155-1.11-1.463-1.11-1.463-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0 1 12 6.836a9.59 9.59 0 0 1 2.504.337c1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.202 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.741 0 .267.18.578.688.48C19.138 20.163 22 16.418 22 12c0-5.523-4.477-10-10-10z" />
+      </svg>
+    </a>
+
+  </div><!-- .page -->
+
+  <script src="script.js" defer></script>
+</body>
+
+</html>
