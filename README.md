@@ -3,6 +3,7 @@
 A lightweight browser-based tool to convert AmneziaWG configurations (`vpn://` keys or native AmneziaWG format) into AWG-compatible endpoint configs for [sing-box with AWG support](https://github.com/spoofi/sing-box-awg).
 
 ## Try now
+
 <https://spoofi.github.io/amnezia-to-sing-box/>
 
 ## ✨ Features
@@ -26,4 +27,5 @@ A lightweight browser-based tool to convert AmneziaWG configurations (`vpn://` k
 No telemetry, no backend, no tracking. Your configs never leave your browser.
 
 ---
-*Built for the AmneziaVPN + sing-box community.*
+
+_Built for the AmneziaVPN + sing-box community._
