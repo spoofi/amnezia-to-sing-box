@@ -71,6 +71,11 @@ function parseAllowedIPs(raw) {
     return String(raw).split(',').map(s => s.trim()).filter(Boolean);
 }
 
+function ensureCIDR(addr) {
+    if (addr.includes('/')) return addr;
+    return addr.includes(':') ? `${addr}/128` : `${addr}/32`;
+}
+
 function splitEndpoint(raw) {
     if (!raw) return { host: '', port: 0 };
     const i = raw.lastIndexOf(':');
@@ -117,9 +122,7 @@ function buildFromAWG2(container, topData, index) {
     const i5 = strVal(awg.I5 ?? lc.I5);
 
     const clientIp = strVal(lc.client_ip ?? '');
-    const address = clientIp
-        ? (clientIp.includes('/') ? [clientIp] : [`${clientIp}/32`])
-        : [];
+    const address = clientIp ? [ensureCIDR(clientIp)] : [];
 
     const serverHost = strVal(lc.hostName ?? topData.hostName ?? '');
     const serverPort = intVal(lc.port ?? awg.port);
@@ -158,7 +161,7 @@ function buildFromINI(text) {
 
     const addrRaw = strVal(iface.Address);
     const address = addrRaw
-        ? addrRaw.split(',').map(s => s.trim()).filter(Boolean)
+        ? addrRaw.split(',').map(s => ensureCIDR(s.trim())).filter(Boolean)
         : [];
 
     const peers = ini.peers.map(p => {
